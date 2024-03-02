@@ -1,7 +1,11 @@
 export interface Checklist {
     id: string,
     title: string
-
+    
+}
+export type checklistItem ={
+    id: string,
+    title: string
 }
 
 export type AddChecklist= Omit <Checklist, 'id'>

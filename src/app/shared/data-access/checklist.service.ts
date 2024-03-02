@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AddChecklist, Checklist } from '../interfaces/checklist';
-import { Subject,  } from 'rxjs';
+import { AddChecklist, Checklist,checklistItem } from '../interfaces/checklist';
+import { Subject, } from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop'
 
 export interface ChecklistsState {
@@ -35,7 +35,8 @@ export class ChecklistService {
   private addIdToChecklist<Checklist>(checklist: AddChecklist){
    return {
     ...checklist,
-    id: this.generateSlug(checklist.title)
+    id: this.generateSlug(checklist.title),
+    
    }
 
   }

@@ -8,6 +8,9 @@ export const routes: Routes = [
     path: '',
     redirectTo: 'home',
     pathMatch: 'full'
+},
+{
+    path: 'checklist/:id',
+    loadComponent: () =>import('./checklist-detail/checklist-detail.component')
 }
-
 ];
