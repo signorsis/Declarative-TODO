@@ -16,7 +16,11 @@ import { ChecklistItemListComponent } from './ui/checklistItem-list.component';
   imports: [HeaderComponent, ModalComponent, FormModalComponent, ChecklistItemListComponent],
   template: `
    @if (checklist(); as checklist) {
-    <app-header [checklist]="checklist"  (addItem)="checklistItemBeingEdited.set({})"/>
+    <app-header [checklist]="checklist" 
+                 (addItem)="checklistItemBeingEdited.set({})"
+                (resetChecklist)="checklistItemService.reset$.next($event)"
+    
+    />
     <app-modal [isOpen]="!!checklistItemBeingEdited()">
       <ng-template >
         <app-form-modal [formgroup]="checklistItemForm" 
@@ -29,7 +33,9 @@ import { ChecklistItemListComponent } from './ui/checklistItem-list.component';
       </ng-template>
       
     </app-modal>
-     <app-checklistItem-list [checklistItems]="checklistItems()"></app-checklistItem-list>
+     <app-checklistItem-list [checklistItems]="checklistItems() "
+       (toggle)="checklistItemService.toggle$.next($event)"
+     ></app-checklistItem-list>
    }
    
 
@@ -42,9 +48,11 @@ export default class ChecklistDetailComponent {
      checklistItemService=inject(ChecklistItemService)
      route=inject(ActivatedRoute)
      formBuilder=inject(FormBuilder)
+
      checklistItemForm=this.formBuilder.nonNullable.group({
       title:['']
      })
+     
      checklistItemBeingEdited=signal<Partial<ChecklistItem> | null>(null)
      params=toSignal(this.route.paramMap)
      
