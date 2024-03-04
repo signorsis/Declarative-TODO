@@ -1,5 +1,5 @@
 import { Injectable, computed, signal } from '@angular/core';
-import { AddChecklist, Checklist,checklistItem } from '../interfaces/checklist';
+import { AddChecklist, Checklist,} from '../interfaces/checklist';
 import { Subject, } from 'rxjs';
 import {takeUntilDestroyed} from '@angular/core/rxjs-interop'
 

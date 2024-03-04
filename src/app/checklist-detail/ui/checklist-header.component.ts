@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Checklist } from '../../shared/interfaces/checklist';
 
@@ -11,10 +11,12 @@ import { Checklist } from '../../shared/interfaces/checklist';
 
     <a routerLink="/home"> back</a>
     <h1> {{checklist.title}}</h1>
+    <button (click)="addItem.emit()"> Add Item</button>
 </header>
   `,
   styles: ``
 })
 export class HeaderComponent {
 @Input({required: true}) checklist!:Checklist 
+@Output() addItem=new EventEmitter<void>()
 }
