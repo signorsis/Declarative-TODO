@@ -1,26 +1,39 @@
-import { Injectable, computed, signal } from '@angular/core';
+import { Injectable, computed, effect, inject, signal } from '@angular/core';
 import { AddChecklistItem, ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/checklist-item';
 import { Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
+import { StorageService } from '../../shared/data-access/storage.service';
 
 
 export interface ChecklistItemState {
-  checklistItems: ChecklistItem[]
+  checklistItems: ChecklistItem[],
+  loaded: boolean,
+  error: string | null
 }
 @Injectable({
   providedIn: 'root'
 })
 export class ChecklistItemService {
+  // storage service using local storage
+   storageService=inject(StorageService)
+
+
  // state
-   private state=signal<ChecklistItemState>({checklistItems: []})
+   private state=signal<ChecklistItemState>({checklistItems: [], loaded: false, error: null})
 
  //selector
  checklistItems=computed(()=> this.state().checklistItems)
-
+ loaded=computed(()=>this.state().loaded)
   //  observer or source
    add$=new Subject<AddChecklistItem>()
    toggle$=new Subject<RemoveChecklistItem>()
    reset$=new Subject<RemoveChecklistItem>()
+      // source from local storag supplied using storageService
+    loadChecklistItems$=this.storageService.loadChecklistItems()
+  
+
+
+
   constructor() { 
     //reducer
     this.add$.pipe(takeUntilDestroyed()).subscribe((checklistItem)=>
@@ -67,5 +80,24 @@ export class ChecklistItemService {
 
                                                       )) 
                                                       )
-  }
+  
+   this.loadChecklistItems$.pipe(takeUntilDestroyed()).subscribe({
+    next: (checklistItems)=>(
+      this.state.update(state=>({
+        ...state,
+        checklistItems,
+        loaded: true,
+
+      }))
+    ),
+    error: (err)=> this.state.update(state=> ({...state, error: err}))
+   })
+   
+   effect(()=>{
+    if(this.loaded())
+    {
+      this.storageService.saveChecklistItems(this.checklistItems())
+    }
+   })
+ }
 }
