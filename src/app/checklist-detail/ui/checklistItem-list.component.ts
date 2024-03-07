@@ -17,7 +17,7 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
                     @if(listItem.checked)
                 { <span>✅</span>
                          
-                }   {{listItem.title}}</div>
+                }   {{listItem.title}}  <span><button (click)="delete.emit(listItem.id)">del</button></span></div>
             
             <div>
                 <button (click)="toggle.emit(listItem.id)">Toggle</button>
@@ -27,8 +27,8 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
 
             @empty {
                 <div>
-                    <h2>Add an item</h2>
-                    <p>Click the add button to add your first item to this quicklist</p>
+                     <h2>Add an item</h2>
+                     <p>Click the add button to add your first item to this quicklist</p>
                 </div>
             }
 
@@ -41,6 +41,7 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
 export class ChecklistItemListComponent  {
      @Input({required: true}) checklistItems!: ChecklistItem[]
      @Output() toggle=new EventEmitter<RemoveChecklist>()
+     @Output() delete=new EventEmitter<RemoveChecklist>()
      
     constructor() { }
 

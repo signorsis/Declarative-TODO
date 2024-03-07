@@ -17,20 +17,24 @@ export class ChecklistItemService {
   // storage service using local storage
    storageService=inject(StorageService)
 
-
+  
  // state
    private state=signal<ChecklistItemState>({checklistItems: [], loaded: false, error: null})
 
- //selector
+ //selectors
  checklistItems=computed(()=> this.state().checklistItems)
  loaded=computed(()=>this.state().loaded)
-  //  observer or source
+ 
+ //  observer or source
    add$=new Subject<AddChecklistItem>()
    toggle$=new Subject<RemoveChecklistItem>()
    reset$=new Subject<RemoveChecklistItem>()
-      // source from local storag supplied using storageService
-    loadChecklistItems$=this.storageService.loadChecklistItems()
-  
+   //crude sources
+   delete$=new Subject<RemoveChecklistItem>()
+
+   // source from local storage supplied using storageService
+   loadChecklistItems$=this.storageService.loadChecklistItems()
+   
 
 
 
@@ -85,19 +89,31 @@ export class ChecklistItemService {
     next: (checklistItems)=>(
       this.state.update(state=>({
         ...state,
-        checklistItems,
+        checklistItems: checklistItems,
         loaded: true,
 
       }))
     ),
+
+
     error: (err)=> this.state.update(state=> ({...state, error: err}))
    })
-   
+   this.delete$.pipe(takeUntilDestroyed()).subscribe((checklistItemId)=>this.state.update(
+                                                  state=>({
+                                                    ...state,
+                                                    checklistItems: state.checklistItems.filter(listItems=>
+                                                      listItems.id!==checklistItemId
+                                                      )
+                                                  })
+                                            ))
+   //effect
    effect(()=>{
     if(this.loaded())
     {
       this.storageService.saveChecklistItems(this.checklistItems())
     }
    })
+
+
  }
 }

@@ -20,27 +20,29 @@ import { ChecklistItemListComponent } from './ui/checklistItem-list.component';
                  (addItem)="checklistItemBeingEdited.set({})"
                 (resetChecklist)="checklistItemService.reset$.next($event)"
     
-    />
+    />}
     <app-modal [isOpen]="!!checklistItemBeingEdited()">
       <ng-template >
         <app-form-modal [formgroup]="checklistItemForm" 
-                     title="Create Item"
-                     (save)="checklistItemService.add$
+        title="Create Item"
+        (save)="checklistItemService.add$
                      .next({item: checklistItemForm.getRawValue(),
-                            checklistId: checklist?.id!})"
+                            checklistId: checklist()?.id!})"
                             (close)="checklistItemBeingEdited.set(null)"
         ></app-form-modal>
       </ng-template>
       
     </app-modal>
-     <app-checklistItem-list [checklistItems]="checklistItems() "
-       (toggle)="checklistItemService.toggle$.next($event)"
-     ></app-checklistItem-list>
-   }
-   
-
-
-  `,
+    <app-checklistItem-list [checklistItems]="checklistItems()"
+    (toggle)="checklistItemService.toggle$.next($event)"
+    (delete)="checklistItemService.delete$.next($event)"
+    ></app-checklistItem-list>
+    
+    
+    
+  
+    
+    `,
   styles: ``
 })
 export default class ChecklistDetailComponent {
@@ -48,7 +50,7 @@ export default class ChecklistDetailComponent {
      checklistItemService=inject(ChecklistItemService)
      route=inject(ActivatedRoute)
      formBuilder=inject(FormBuilder)
-
+    
      checklistItemForm=this.formBuilder.nonNullable.group({
       title:['']
      })
@@ -60,7 +62,10 @@ export default class ChecklistDetailComponent {
      this.checklistService.checklists().find((checklist)=> checklist.id===this.params()?.get('id'))
      )
      
-     checklistItems=this.checklistItemService.checklistItems
+     checklistItems=computed(()=>
+     this.checklistItemService.checklistItems().filter(item=>item.checklist_id===this.params()?.get('id'))
+     )
+     
      constructor () {
       effect(()=>{
         const checklistItem=this.checklistItemBeingEdited()
