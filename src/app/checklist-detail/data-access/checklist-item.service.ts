@@ -1,8 +1,9 @@
 import { Injectable, computed, effect, inject, signal } from '@angular/core';
-import { AddChecklistItem, ChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/checklist-item';
+import { AddChecklistItem, ChecklistItem, EditChecklistItem, RemoveChecklistItem } from '../../shared/interfaces/checklist-item';
 import { Subject } from 'rxjs';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { StorageService } from '../../shared/data-access/storage.service';
+import { RemoveChecklist } from '../../shared/interfaces/checklist';
 
 
 export interface ChecklistItemState {
@@ -29,8 +30,13 @@ export class ChecklistItemService {
    add$=new Subject<AddChecklistItem>()
    toggle$=new Subject<RemoveChecklistItem>()
    reset$=new Subject<RemoveChecklistItem>()
-   //crude sources
-   delete$=new Subject<RemoveChecklistItem>()
+
+   //crud sources
+   remove$=new Subject<RemoveChecklistItem>()
+   edit$=new Subject<EditChecklistItem>()
+
+   //shared source for checklist service and checklistitems service
+   checklistRemoved$=new Subject<RemoveChecklist>()
 
    // source from local storage supplied using storageService
    loadChecklistItems$=this.storageService.loadChecklistItems()
@@ -98,7 +104,7 @@ export class ChecklistItemService {
 
     error: (err)=> this.state.update(state=> ({...state, error: err}))
    })
-   this.delete$.pipe(takeUntilDestroyed()).subscribe((checklistItemId)=>this.state.update(
+   this.remove$.pipe(takeUntilDestroyed()).subscribe((checklistItemId)=>this.state.update(
                                                   state=>({
                                                     ...state,
                                                     checklistItems: state.checklistItems.filter(listItems=>
@@ -106,6 +112,15 @@ export class ChecklistItemService {
                                                       )
                                                   })
                                             ))
+    this.edit$.pipe(takeUntilDestroyed()).subscribe( (update)=>this.state.update(
+                                                state=>({...state, checklistItems: state.checklistItems.map(
+                                                  item=>( item.id===update.id? { ...item, title: update.data.title} : item)
+                                                )})
+    ) )
+   
+    this.checklistRemoved$.pipe(takeUntilDestroyed()).subscribe( (checklistId)=> this.state.update(
+      state=> ( {...state, checklistItems: state.checklistItems.filter(item=> item.checklist_id!==checklistId)})
+    ))
    //effect
    effect(()=>{
     if(this.loaded())

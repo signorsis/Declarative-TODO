@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, Output} from '@angular/core';
-import { ChecklistItem } from '../../shared/interfaces/checklist-item';
+import { ChecklistItem, EditChecklistItem } from '../../shared/interfaces/checklist-item';
 
 import { RemoveChecklist } from '../../shared/interfaces/checklist';
 
@@ -13,11 +13,18 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
             
             @for (listItem of checklistItems; track listItem.id) {
                 
-                <li> <div>
+                <li> 
+                    <div>
                     @if(listItem.checked)
                 { <span>✅</span>
                          
-                }   {{listItem.title}}  <span><button (click)="delete.emit(listItem.id)">del</button></span></div>
+                }   {{listItem.title}} 
+                    <div>
+                        <button (click)="edit.emit(listItem)"> Edit</button>
+                       <button (click)="delete.emit(listItem.id)"> Remove </button>
+                    </div>
+                                    
+                    </div>
             
             <div>
                 <button (click)="toggle.emit(listItem.id)">Toggle</button>
@@ -42,6 +49,7 @@ export class ChecklistItemListComponent  {
      @Input({required: true}) checklistItems!: ChecklistItem[]
      @Output() toggle=new EventEmitter<RemoveChecklist>()
      @Output() delete=new EventEmitter<RemoveChecklist>()
+     @Output() edit=new EventEmitter<ChecklistItem>()
      
     constructor() { }
 

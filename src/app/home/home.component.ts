@@ -5,19 +5,22 @@ import { FormModalComponent } from '../shared/ui/form-modal.component';
 import { FormBuilder } from '@angular/forms';
 import { ChecklistService } from '../shared/data-access/checklist.service';
 import { ChecklistListComponent } from './ui/checklist-list/checklist-list.component';
+import { ChecklistItemService } from '../checklist-detail/data-access/checklist-item.service';
 @Component({
   selector: 'app-home',
   standalone: true,
   imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
   template: `
   <h1> Todos </h1>
-  <button (click)="checkListBeingEditted.set({})">Add new Todo Check List</button>
-    <app-modal [isOpen]="!!checkListBeingEditted()">
+  <button (click)="checklistBeingEdited.set({})">Add new Todo Check List</button>
+    <app-modal [isOpen]="!!checklistBeingEdited()">
   <ng-template >
-  <app-form-modal [formgroup]="checkListForm" 
-  [title]="checkListBeingEditted()?.title? checkListBeingEditted()!.title! : 'Add Checklist'"
-  (close)="checkListBeingEditted.set(null)" 
-  (save)="checklistService.add$.next(checkListForm.getRawValue())"
+  <app-form-modal [formgroup]="checklistForm" 
+  [title]="checklistBeingEdited()?.title? checklistBeingEdited()!.title! : 'Add Checklist'"
+  (close)="checklistBeingEdited.set(null)" 
+  (save)="checklistBeingEdited()?.id?
+          checklistService.edit$.next( {id:checklistBeingEdited()!.id!, data: checklistForm.getRawValue()}) 
+          : checklistService.add$.next(checklistForm.getRawValue())"
   > 
 </app-form-modal>
   </ng-template>
@@ -25,7 +28,10 @@ import { ChecklistListComponent } from './ui/checklist-list/checklist-list.compo
   </app-modal>
 
   
-<app-checklist-list [checklists]="checklistService.checklists() " > 
+<app-checklist-list [checklists]="checklistService.checklists()" 
+                    (edit)="checklistBeingEdited.set($event)"
+                    (remove)="checklistItemService.checklistRemoved$.next($event)"            
+> 
 </app-checklist-list> 
 
   `,
@@ -33,17 +39,23 @@ import { ChecklistListComponent } from './ui/checklist-list/checklist-list.compo
 })
 export default class HomeComponent {
   checklistService=inject(ChecklistService)
-  checkListBeingEditted= signal <Partial<Checklist> | null> (null);
+  checklistItemService=inject(ChecklistItemService)
+  checklistBeingEdited= signal <Partial<Checklist> | null> (null);
   formBuilder=inject(FormBuilder)
-  checkListForm=this.formBuilder.nonNullable.group({
+  checklistForm=this.formBuilder.nonNullable.group({
     title: ['']
   })
   constructor () {
-    effect (()=>{
-            const checklist=this.checkListBeingEditted()
-            if(!checklist){
-              this.checkListForm.reset()
-            }
-    })
+    effect(() => {
+      const checklist = this.checklistBeingEdited();
+
+      if (!checklist) {
+        this.checklistForm.reset();
+      } else {
+        this.checklistForm.patchValue({
+          title: checklist.title,
+        });
+      }
+    });
   }
 }
