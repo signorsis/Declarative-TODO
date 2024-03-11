@@ -1,6 +1,7 @@
 # TheTodo
 
-This A Todo App which is coded Declaratively through and through.
+This is The Todo App that is coded Declaratively through and through! 
+
 
 ## Reactive Programming 
    
