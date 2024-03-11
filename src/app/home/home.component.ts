@@ -11,29 +11,35 @@ import { ChecklistItemService } from '../checklist-detail/data-access/checklist-
   standalone: true,
   imports: [ModalComponent, FormModalComponent, ChecklistListComponent],
   template: `
-  <h1> Todos </h1>
-  <button (click)="checklistBeingEdited.set({})">Add new Todo Check List</button>
+  <header>
+
+    <h1> Todos </h1>
+    <button (click)="checklistBeingEdited.set({})">Add new Todo Check List</button>
+  </header>
+  <section>
+
     <app-modal [isOpen]="!!checklistBeingEdited()">
-  <ng-template >
-  <app-form-modal [formgroup]="checklistForm" 
-  [title]="checklistBeingEdited()?.title? checklistBeingEdited()!.title! : 'Add Checklist'"
-  (close)="checklistBeingEdited.set(null)" 
-  (save)="checklistBeingEdited()?.id?
+      <ng-template >
+        <app-form-modal [formgroup]="checklistForm" 
+        [title]="checklistBeingEdited()?.title? checklistBeingEdited()!.title! : 'Add Checklist'"
+        (close)="checklistBeingEdited.set(null)" 
+        (save)="checklistBeingEdited()?.id?
           checklistService.edit$.next( {id:checklistBeingEdited()!.id!, data: checklistForm.getRawValue()}) 
           : checklistService.add$.next(checklistForm.getRawValue())"
   > 
 </app-form-modal>
-  </ng-template>
-      
-  </app-modal>
+</ng-template>
 
-  
+</app-modal>
+
+
 <app-checklist-list [checklists]="checklistService.checklists()" 
-                    (edit)="checklistBeingEdited.set($event)"
-                    (remove)="checklistItemService.checklistRemoved$.next($event)"            
+(edit)="checklistBeingEdited.set($event)"
+(remove)="checklistItemService.checklistRemoved$.next($event)"            
 > 
 </app-checklist-list> 
 
+</section>
   `,
   styles: ``
 })

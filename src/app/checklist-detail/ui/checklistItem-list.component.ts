@@ -19,15 +19,12 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
                 { <span>✅</span>
                          
                 }   {{listItem.title}} 
+                    </div>
                     <div>
+                        <button (click)="toggle.emit(listItem.id)">Toggle</button>
                         <button (click)="edit.emit(listItem)"> Edit</button>
                        <button (click)="delete.emit(listItem.id)"> Remove </button>
-                    </div>
-                                    
-                    </div>
-            
-            <div>
-                <button (click)="toggle.emit(listItem.id)">Toggle</button>
+                   
             </div>
             </li>    
             }
@@ -42,7 +39,28 @@ import { RemoveChecklist } from '../../shared/interfaces/checklist';
         </ul>
         
     </section>
-    `
+    `,
+    styles :  [
+        `
+          ul {
+            padding: 0;
+            margin: 0;
+          }
+          li {
+            font-size: 1.5em;
+            display: flex;
+            justify-content: space-between;
+            background: var(--color-light);
+            list-style-type: none;
+            margin-bottom: 1rem;
+            padding: 1rem;
+    
+            button {
+              margin-left: 1rem;
+            }
+          }
+        `,
+      ]
 })
 
 export class ChecklistItemListComponent  {

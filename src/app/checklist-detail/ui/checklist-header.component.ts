@@ -9,13 +9,22 @@ import { Checklist, RemoveChecklist } from '../../shared/interfaces/checklist';
   template: `
   <header>
 
-    <a routerLink="/home"> back</a>
+    <a routerLink="/home"> Back</a>
     <h1> {{checklist.title}}</h1>
-    <button (click)="addItem.emit()"> Add Item</button>
-     <button (click)="resetChecklist.emit(checklist.id)"> Reset Checklist</button>
+    <div>
+
+      <button (click)="addItem.emit()"> Add Item</button>
+      <button (click)="resetChecklist.emit(checklist.id)"> Reset </button>
+    </div>
 </header>
   `,
-  styles: ``
+  styles:  [
+    `
+      button {
+        margin-left: 1rem;
+      }
+    `,
+  ],
 })
 export class HeaderComponent {
 @Input({required: true}) checklist!:Checklist 
